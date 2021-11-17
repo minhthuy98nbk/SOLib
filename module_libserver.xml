@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_libserver" default="compile.module.libserver">
+  <dirname property="module.libserver.basedir" file="${ant.file.module_libserver}"/>
+  
+  <property name="module.jdk.home.libserver" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.libserver" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.libserver" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.libserver" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="libserver.output.dir" value="${module.libserver.basedir}/out/production/libServer"/>
+  <property name="libserver.testoutput.dir" value="${module.libserver.basedir}/out/test/libServer"/>
+  
+  <path id="libserver.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="libserver.module.production.classpath">
+    <path refid="${module.jdk.classpath.libserver}"/>
+    <path refid="library.json.classpath"/>
+  </path>
+  
+  <path id="libserver.runtime.production.module.classpath">
+    <pathelement location="${libserver.output.dir}"/>
+    <path refid="library.json.classpath"/>
+  </path>
+  
+  <path id="libserver.module.classpath">
+    <path refid="${module.jdk.classpath.libserver}"/>
+    <pathelement location="${libserver.output.dir}"/>
+    <path refid="library.json.classpath"/>
+  </path>
+  
+  <path id="libserver.runtime.module.classpath">
+    <pathelement location="${libserver.testoutput.dir}"/>
+    <pathelement location="${libserver.output.dir}"/>
+    <path refid="library.json.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.libserver">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.libserver">
+    <patternset refid="excluded.from.module.libserver"/>
+  </patternset>
+  
+  <path id="libserver.module.sourcepath">
+    <dirset dir="${module.libserver.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.libserver" depends="compile.module.libserver.production,compile.module.libserver.tests" description="Compile module libServer"/>
+  
+  <target name="compile.module.libserver.production" depends="register.custom.compilers" description="Compile module libServer; production classes">
+    <mkdir dir="${libserver.output.dir}"/>
+    <javac2 destdir="${libserver.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.libserver}/javac">
+      <compilerarg line="${compiler.args.libserver}"/>
+      <bootclasspath refid="libserver.module.bootclasspath"/>
+      <classpath refid="libserver.module.production.classpath"/>
+      <src refid="libserver.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.libserver"/>
+    </javac2>
+    
+    <copy todir="${libserver.output.dir}">
+      <fileset dir="${module.libserver.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.libserver.tests" depends="register.custom.compilers,compile.module.libserver.production" description="compile module libServer; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.libserver" description="cleanup module">
+    <delete dir="${libserver.output.dir}"/>
+    <delete dir="${libserver.testoutput.dir}"/>
+  </target>
+</project>
